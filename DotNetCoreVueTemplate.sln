@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DotNetCoreVueTemplate.ClientApp", "DotNetCoreVueTemplate.ClientApp\DotNetCoreVueTemplate.ClientApp.njsproj", "{D90F178B-8612-4B61-8156-4FC5C561BB1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D90F178B-8612-4B61-8156-4FC5C561BB1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D90F178B-8612-4B61-8156-4FC5C561BB1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D90F178B-8612-4B61-8156-4FC5C561BB1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D90F178B-8612-4B61-8156-4FC5C561BB1A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {42601EB5-DE26-403C-A328-B55B8CDAD5CD}
+	EndGlobalSection
+EndGlobal

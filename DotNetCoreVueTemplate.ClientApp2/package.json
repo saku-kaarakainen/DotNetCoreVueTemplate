@@ -1,0 +1,9 @@
+{
+  "name": "dot-net-core-vue-template.client-app",
+  "version": "0.0.0",
+  "description": "DotNetCoreVueTemplate.ClientApp",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  }
+}
