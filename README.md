@@ -1,7 +1,7 @@
 # DotNetCoreVueTemplate
 My template for creating .NET Core Vue apps
 
-The app is make with:
+The app is made with:
  - Vue 3
  - dart-sass
  - babel
