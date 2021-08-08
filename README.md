@@ -5,7 +5,7 @@ The app is made with:
  - Vue 3
  - dart-sass
  - babel
- - typwescript
+ - typescript
  - router
  - vuex
  - eslint
