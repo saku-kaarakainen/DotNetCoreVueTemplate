@@ -1,4 +1,5 @@
-﻿using DotNetCoreVueTemplate.CoreApp.Models;
+﻿using DotNetCoreVueTemplate.CoreApp.Components;
+using DotNetCoreVueTemplate.CoreApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace DotNetCoreVueTemplate.CoreApp.Controllers
 {
-    // 2021-08-07: Class copied from: https://github.com/SoftwareAteliers/asp-net-core-vue-starter/blob/master/Controllers/WeatherForecastController.cs
-    // Credits to SoftwareAteliers 
+    // 2021-08-07: Class copied and modified from: https://github.com/SoftwareAteliers/asp-net-core-vue-starter/blob/master/Controllers/WeatherForecastController.cs
     [ApiController]
     [Route("api/[controller]")]
+    [ServiceFilter(typeof(HandleExceptionFilter))] 
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

@@ -1,59 +1,82 @@
-<!--
-  2021-08-07: Template modified from https://github.com/SoftwareAteliers/asp-net-core-vue-starter/blob/master/ClientApp/src/views/FetchData-decorator.vue
--->
 <template>
-  <v-container fluid>
-    <!--
-  <v-slide-y-transition mode="out-in">
-    <v-row>
-      <v-col>
-        <h1>Weather forecast</h1>
-        <p>This component demonstrates fetching data from the server.</p>
+  <!--
+    https://stackoverflow.com/a/64039546
+    You need to use Suspense tag, when using async setup
+    -->
+  <Suspense>
+    <!-- the normal case -->
+    <template #default>
+      <table>
+        <tr>
+          <th v-for="header in headers" :key="header.value">{{ header.text }}</th>
+        </tr>
+        <tr v-for="forecast in forecasts" :key="forecast">
+          <td>{{ forecast.date }}</td>
+          <td :style="{ color: getColor(forecast.temperatureC) }">{{ forecast.temperatureC }}</td>
+          <td :style="{ color: getColor(forecast.temperatureF) }">{{ forecast.temperatureF }}</td>
+          <td>{{ forecast.summary }}</td>
+        </tr>
+      </table>
+    </template>
 
-        <v-data-table :headers="headers"
-                      :items="forecasts"
-                      hide-default-footer
-                      :loading="loading"
-                      class="elevation-1">
-          <template v-slot:progress>
-            <v-progress-linear color="blue" indeterminate></v-progress-linear>
-          </template>
-          <template v-slot:[`item.date`]="{ item }">
-            <td>{{ item.date | date }}</td>
-          </template>
-          <template v-slot:[`item.temperatureC`]="{ item }">
-            <v-chip :color="getColor(item.temperatureC)" dark>{{ item.temperatureC }}</v-chip>
-          </template>
-        </v-data-table>
-      </v-col>
-    </v-row>
-  </v-slide-y-transition>
-
-  <v-alert :value="showError" type="error" v-text="errorMessage">
-    This is an error alert.
-  </v-alert>
-
-  <v-alert :value="showError" type="warning">
-    Are you sure you're using ASP.NET Core endpoint? (default at
-    <a href="http://localhost:5000/fetch-data">http://localhost:5000</a>)<br />
-    API call would fail with status code 404 when calling from Vue app (default at
-    <a href="http://localhost:8080/fetch-data">http://localhost:8080</a>) without devServer proxy
-    settings in vue.config.js file.
-  </v-alert>
-  -->
-  </v-container>
+    <!-- the asynchronous call is not done yet. -->
+    <template #fallback>
+      <span>Loading...</span>
+    </template>
+  </Suspense>
 </template>
 
-<!-- This is no longer work of SoftwareAteliers. -->
 <script lang="ts">
-import { computed } from 'vue'
-export default {
-  // props � contains all of the props passed to our component
-  // context � contains attrs, slots, and emit
-  setup (props:any, context:any): void {
-    console.log('hello world')
+  import { Forecast } from '../models/forecast'
+  import { ApiService } from '../services/ApiService'
+
+  export default {
+    async setup() {
+      const service = new ApiService()
+
+      // Initializing properties
+      var showError = false
+      var errorMessage = 'Error while loading weather forecast'
+      var headers = [
+        { text: 'Date', value: 'date' },
+        { text: 'Temp. (C)', value: 'temperatureC' },
+        { text: 'Temp. (F)', value: 'temperatureF' },
+        { text: 'Summary', value: 'summary' }
+      ]
+      var forecasts = Array<Forecast>()
+
+      // Declare functions
+      function getColor(temperature: number): string {
+        if (temperature < 0) {
+          return 'blue'
+        } else if (temperature >= 0 && temperature < 30) {
+          return 'green'
+        } else {
+          return 'red'
+        }
+      }
+
+      // API call
+      try {
+        forecasts = await service.fetchData()
+      } catch (e) {
+        showError = true
+        errorMessage = `Error while loading weather forecast: ${e.message}.`
+      }
+
+      // return data for the template
+      return {
+        // "properties"
+        showError: showError,
+        errorMessage: errorMessage,
+        headers: headers,
+        forecasts: forecasts,
+
+        // methods
+        getColor
+      }
+    }
   }
-}
 </script>
 
 <style lang="scss" scoped>
