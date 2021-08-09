@@ -1,10 +1,7 @@
 <template>
-  <!--
-    https://stackoverflow.com/a/64039546
-    You need to use Suspense tag, when using async setup
-    -->
-  <Suspense>
-    <!-- the normal case -->
+  <div v-if="showError">{{ errorMessage }}</div>
+
+  <Suspense v-else>
     <template #default>
       <table>
         <tr>
@@ -19,7 +16,6 @@
       </table>
     </template>
 
-    <!-- the asynchronous call is not done yet. -->
     <template #fallback>
       <span>Loading...</span>
     </template>
@@ -27,13 +23,11 @@
 </template>
 
 <script lang="ts">
-  import { Forecast } from '../models/forecast'
-  import { ApiService } from '../services/ApiService'
+  import { computed } from 'vue'
+  import { weatherForecast } from '../services/ApiService'
 
   export default {
-    async setup() {
-      const service = new ApiService()
-
+    setup() {
       // Initializing properties
       var showError = false
       var errorMessage = 'Error while loading weather forecast'
@@ -43,7 +37,6 @@
         { text: 'Temp. (F)', value: 'temperatureF' },
         { text: 'Summary', value: 'summary' }
       ]
-      var forecasts = Array<Forecast>()
 
       // Declare functions
       function getColor(temperature: number): string {
@@ -57,12 +50,9 @@
       }
 
       // API call
-      try {
-        forecasts = await service.fetchData()
-      } catch (e) {
-        showError = true
-        errorMessage = `Error while loading weather forecast: ${e.message}.`
-      }
+      const forecasts = computed(() => {
+        return weatherForecast().forecasts
+      })
 
       // return data for the template
       return {
@@ -70,7 +60,9 @@
         showError: showError,
         errorMessage: errorMessage,
         headers: headers,
-        forecasts: forecasts,
+
+        // computed values
+        forecasts: forecasts.value,
 
         // methods
         getColor

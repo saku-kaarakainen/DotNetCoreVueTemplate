@@ -2,13 +2,16 @@ using DotNetCoreVueTemplate.CoreApp.Components;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.SpaServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using VueCliMiddleware;
 
 namespace DotNetCoreVueTemplate.CoreApp
 {
@@ -24,6 +27,9 @@ namespace DotNetCoreVueTemplate.CoreApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // NOTE: PRODUCTION Ensure this is the same path that is specified in your webpack output
+            services.AddSpaStaticFiles(opt => opt.RootPath = "../ClientApp/dist");
+
             services.AddControllersWithViews();
             services.AddSingleton(Configuration);
             services.AddScoped<HandleExceptionFilter>();
@@ -43,38 +49,31 @@ namespace DotNetCoreVueTemplate.CoreApp
                 app.UseHsts();
             }
 
-            // Adds the CSP
-            app.Use(async (context, nextMiddleware) =>
-            {
-                context.Response.OnStarting(async () =>
-                {
-                    // Adds CSP to HTTP response headers
-                    context.Response.Headers.AddOrUpdate("Content-Security-Policy", Configuration.GetValue<string>("CSP-Headers:CSP"));
-                    context.Response.Headers.AddOrUpdate("X-Frame-Options", Configuration.GetValue<string>("CSP-Headers:X-Frame-Options"));
-
-                    await nextMiddleware();
-                });
-            });
+            // PRODUCTION uses webpack static files
+            app.UseSpaStaticFiles();
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
 
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute("SPA-catchall", "{*url}", defaults: new { controller = "Home", action = "Index" });
+                endpoints.MapToVueCliProxy(
+                    "{*path}",
+                    new SpaOptions { SourcePath = $"../{Extensions.GetNamespaceRoot<Startup>()}.ClientApp" },
+                    npmScript: Debugger.IsAttached ? "serve" : null,
+                    regex: "Compiled successfully",
+                    forceKill: true,
+                    wsl: false // Set to true if you are using WSL on windows. For other operating systems it will be ignored
+                );
             });
         }
+    }
+
+    public static class Extensions
+    {
+        public static string GetNamespaceRoot<TType>() => typeof(TType).Namespace.Split('.')[0];
     }
 }
