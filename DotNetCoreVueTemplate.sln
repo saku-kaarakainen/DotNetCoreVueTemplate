@@ -5,7 +5,14 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "DotNetCoreVueTemplate.ClientApp", "DotNetCoreVueTemplate.ClientApp\DotNetCoreVueTemplate.ClientApp.njsproj", "{D90F178B-8612-4B61-8156-4FC5C561BB1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCoreVueTemplate.CoreApp", "DotNetCoreVueTemplate.CoreApp\DotNetCoreVueTemplate.CoreApp.csproj", "{2BC64DB6-CF87-44FB-9F94-33E56679427E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCoreVueTemplate.CoreApp", "DotNetCoreVueTemplate.CoreApp\DotNetCoreVueTemplate.CoreApp.csproj", "{2BC64DB6-CF87-44FB-9F94-33E56679427E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{4B9A0475-5BEF-460B-B230-AE096E06E6C2}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

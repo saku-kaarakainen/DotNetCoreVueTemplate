@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,6 +32,25 @@ namespace DotNetCoreVueTemplate.CoreApp
             services.AddSpaStaticFiles(opt => opt.RootPath = "../ClientApp/dist");
 
             services.AddControllersWithViews();
+
+            // If you want to use Microsoft SQL database, uncomment this line below:
+            // services.AddDbContext<Database.DotnetCoreVueTemplateContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DotnetCoreVueTemplateConnectionString")));
+            //
+            // After that you need to specify your connection string
+            // I haven't done that yet so for now on, you need to figure it out by yourself.
+            // Also, FYI this project has both Microsoft.EntityFrameworkCore.SqlServer and Microsoft.EntityFrameworkCore.InMemory, 
+            // you may not need both.
+            // For now, we are using in-memory database. So the data is saved in the memory of your IIS server
+            services.AddDbContext<Database.DotnetCoreVueTemplateContext>(options => options.UseInMemoryDatabase("DotnetCoreVueTemplateContextDatabase"));
+            // If you want to use in-memory database in your unit tests, I have been using this to create my mock database:
+            /*
+                var databaseName = Guid.NewGuid().ToString();
+                var options = new DbContextOptionsBuilder<MerikarttapalauteContextReadWrite>()
+                    .UseInMemoryDatabase(databaseName: databaseName)
+                    .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning)) // NOTE: This removes db_transaction error messages -> allows tests to work!
+                    .Options;
+             */
+
             services.AddSingleton(Configuration);
             services.AddScoped<HandleExceptionFilter>();
         }
@@ -48,6 +68,11 @@ namespace DotNetCoreVueTemplate.CoreApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            // There are millions of ways to populate database. I'm not sure if I personally would populate like this,
+            // but this is populated this way just for demo.
+            var context = app.ApplicationServices.GetService<Database.DotnetCoreVueTemplateContext>();
+            context.PopulateDatabase();
 
             // PRODUCTION uses webpack static files
             app.UseSpaStaticFiles();
