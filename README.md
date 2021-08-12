@@ -2,15 +2,18 @@
 My template for creating .NET Core Vue apps
 
 The app is made with:
- - Vue 3
- - dart-sass
- - babel
- - typescript
- - router
- - vuex
- - eslint
- - axios
- - .NET Core 5.0
+- Frontend
+  - Vue 3
+  - dart-sass
+  - babel
+  - typescript
+  - router
+  - vuex
+  - eslint
+  - axios
+- Backend
+  - .NET Core 5.0
+  - VueCliMiddleware
 
 The app is separated into two different projects inside the solution and both of them can be run separately, but they should be run simultaneously. Visual Studio is the recommended IDE.
 
