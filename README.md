@@ -20,7 +20,4 @@ The app is separated into two different projects inside the solution and both of
 This template is loosely based on https://github.com/SoftwareAteliers/asp-net-core-vue-starter. I wanted to make my own template, because I found the template slow and I wanted to try vue3. I am guessing the slowness comes  from the vue middleware binding. I avoid it by keeping both apps (vue SPA and .NET Core) as separate as possible.
 
 # TODO-list
- - Entity Framework
- - AutoMapper
- - Vuetify and use it in the template
- - Unit tests, both frontend and backend
+ - Unit tests
