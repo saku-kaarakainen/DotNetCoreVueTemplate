@@ -1,4 +1,5 @@
-﻿using DotNetCoreVueTemplate.CoreApp.Components;
+﻿using AutoMapper;
+using DotNetCoreVueTemplate.CoreApp.Components;
 using DotNetCoreVueTemplate.CoreApp.Database;
 using DotNetCoreVueTemplate.CoreApp.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace DotNetCoreVueTemplate.CoreApp.Controllers
 {
-    // 2021-08-07: Class copied and modified from: https://github.com/SoftwareAteliers/asp-net-core-vue-starter/blob/master/Controllers/WeatherForecastController.cs
     [ApiController]
     [Route("api/[controller]")]
     [ServiceFilter(typeof(HandleExceptionFilter))] 
@@ -19,20 +19,22 @@ namespace DotNetCoreVueTemplate.CoreApp.Controllers
     {
         private readonly DotnetCoreVueTemplateContext context;
         private readonly ILogger<WeatherForecastController> logger;
+        private readonly IMapper mapper;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, DotnetCoreVueTemplateContext context)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, DotnetCoreVueTemplateContext context, IMapper mapper)
         {
             this.logger = logger;
             this.context = context;
+            this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Models.WeatherForecast>> Get()
+        public IEnumerable<Models.WeatherForecast> Get()
         {
             var tenDaysAgo = DateTime.Now - TimeSpan.FromDays(10);
             return from table in this.context.WeatherForecasts
                    where table.Date > tenDaysAgo
-                   select new Models.WeatherForecast(table.Date, table.TemperatureC, table.Summary);
+                   select mapper.Map<Models.WeatherForecast>(table);
         }
     }
 }

@@ -28,6 +28,8 @@ namespace DotNetCoreVueTemplate.CoreApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
+
             // NOTE: PRODUCTION Ensure this is the same path that is specified in your webpack output
             services.AddSpaStaticFiles(opt => opt.RootPath = "../ClientApp/dist");
 
