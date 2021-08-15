@@ -69,11 +69,6 @@ namespace DotNetCoreVueTemplate.CoreApp
                 app.UseHsts();
             }
 
-            // There are millions of ways to populate database. I'm not sure if I personally would populate like this,
-            // but this is populated this way just for demo.
-            var context = app.ApplicationServices.GetService<Database.DotnetCoreVueTemplateContext>();
-            context.PopulateDatabase();
-
             // PRODUCTION uses webpack static files
             app.UseSpaStaticFiles();
 

@@ -27,17 +27,12 @@ namespace DotNetCoreVueTemplate.CoreApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<WeatherForecast>> Get()
+        public async Task<IEnumerable<Models.WeatherForecast>> Get()
         {
-            var rng = new Random();
-            var summaries = await this.context.Summaries.Select(s => s.Name).ToArrayAsync();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = summaries[rng.Next(summaries.Length)]
-            })
-            .ToArray();
+            var tenDaysAgo = DateTime.Now - TimeSpan.FromDays(10);
+            return from table in this.context.WeatherForecasts
+                   where table.Date > tenDaysAgo
+                   select new Models.WeatherForecast(table.Date, table.TemperatureC, table.Summary);
         }
     }
 }
