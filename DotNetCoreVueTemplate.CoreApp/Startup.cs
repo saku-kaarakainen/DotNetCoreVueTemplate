@@ -1,9 +1,15 @@
 using DotNetCoreVueTemplate.CoreApp.Components;
+using DotNetCoreVueTemplate.CoreApp.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,15 +41,9 @@ namespace DotNetCoreVueTemplate.CoreApp
 
             services.AddControllersWithViews();
 
-            // If you want to use Microsoft SQL database, uncomment this line below:
-            // services.AddDbContext<Database.DotnetCoreVueTemplateContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DotnetCoreVueTemplateConnectionString")));
-            //
-            // After that you need to specify your connection string
-            // I haven't done that yet so for now on, you need to figure it out by yourself.
-            // Also, FYI this project has both Microsoft.EntityFrameworkCore.SqlServer and Microsoft.EntityFrameworkCore.InMemory, 
-            // you may not need both.
-            // For now, we are using in-memory database. So the data is saved in the memory of your IIS server
-            services.AddDbContext<Database.DotnetCoreVueTemplateContext>(options => options.UseInMemoryDatabase("DotnetCoreVueTemplateContextDatabase"));
+            // As you can see, I am using a real database. 
+            // Check appsettings.json, This one doesn't have any security.
+            services.AddDbContext<Database.DotnetCoreVueTemplateContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             // If you want to use in-memory database in your unit tests, I have been using this to create my mock database:
             /*
                 var databaseName = Guid.NewGuid().ToString();
@@ -71,6 +71,8 @@ namespace DotNetCoreVueTemplate.CoreApp
                 app.UseHsts();
             }
 
+            app.MigrateDatabase<DotnetCoreVueTemplateContext>();
+
             // PRODUCTION uses webpack static files
             app.UseSpaStaticFiles();
 
@@ -97,5 +99,49 @@ namespace DotNetCoreVueTemplate.CoreApp
     public static class Extensions
     {
         public static string GetNamespaceRoot<TType>() => typeof(TType).Namespace.Split('.')[0];
+
+        /// <summary>
+        /// Migrate any database changes on startup (includes initial database creation)
+        /// </summary>
+        public static IApplicationBuilder MigrateDatabase<TDatabase>(this IApplicationBuilder app)
+            where TDatabase : DbContext, IDbContext
+        {            
+            using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<TDatabase>();
+            
+            // Creates the database if it doesn't exists
+            context.Database.EnsureCreated();
+
+            var serviceProvider = (context as IInfrastructure<IServiceProvider>).Instance;
+
+            var differ = serviceProvider.GetRequiredService<IMigrationsModelDiffer>();
+            var migrationsAssembly = serviceProvider.GetRequiredService<IMigrationsAssembly>();
+
+            if (migrationsAssembly.ModelSnapshot != null)
+            {
+                // Migrations can only be done if there is any.
+                IModel snapshot = migrationsAssembly.ModelSnapshot.Model;
+
+                var dependencies = context.GetService<ProviderConventionSetBuilderDependencies>();
+                var relationalDependencies = context.GetService<RelationalConventionSetBuilderDependencies>();
+
+                TypeMappingConvention typeMappingConvention = new(dependencies);
+                typeMappingConvention.ProcessModelFinalizing(((IConventionModel)snapshot).Builder, null);
+
+                RelationalModelConvention relationalModelConvention = new(dependencies, relationalDependencies);
+                var sourceModel = relationalModelConvention.ProcessModelFinalized(snapshot);
+                var relationModel = ((IMutableModel)sourceModel).FinalizeModel().GetRelationalModel();
+
+                if (differ.HasDifferences(relationModel, context.Model.GetRelationalModel()))
+                {
+                    throw new ApplicationException("There are differences between models of the database and this application. Have you run all migration scripts?");
+                }
+            }
+
+            context.Database.Migrate();
+            context.Populate();
+
+            return app;
+        }
     }
 }

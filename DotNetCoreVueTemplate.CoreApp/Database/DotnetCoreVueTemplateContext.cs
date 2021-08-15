@@ -1,17 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DotNetCoreVueTemplate.CoreApp.Database
 {
+    public interface IDbContext 
+    {
+        void Populate();
+    }
+
     /// <summary>
     /// Code First Context.
     /// </summary>
-    public class DotnetCoreVueTemplateContext : DbContext
+    public class DotnetCoreVueTemplateContext : DbContext, IDbContext
     {
         public DotnetCoreVueTemplateContext(DbContextOptions<DotnetCoreVueTemplateContext> options)
             : base(options)
@@ -21,15 +29,13 @@ namespace DotNetCoreVueTemplate.CoreApp.Database
 
         public DbSet<WeatherForecast> WeatherForecasts { get; set; }
 
-        // This template is missing migration scripts. I am sorry, but for now, you need to figure it out bu
-
-        // Note that the data might not be in order if you are using asynchronous context.
-        public void CreateDatabaseIfNotExists()
+        // Note that the data might not be in order if you are going to use asynchronous context.
+        public void Populate()
         {
             var context = this;
-            context.Database.EnsureCreated();
+            context.Database.EnsureCreated(); // this might be redundant line
 
-            if(context.WeatherForecasts.Any())
+            if (context.WeatherForecasts.Any())
             {
                 return; // DB has been seeded
             }
