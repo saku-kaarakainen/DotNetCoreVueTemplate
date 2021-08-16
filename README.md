@@ -11,6 +11,7 @@ The app is made with:
   - vuex
   - eslint
   - axios
+  - vuetify (Alpha version at the time of writing this)
 - Backend
   - .NET Core 5.0
   - VueCliMiddleware
