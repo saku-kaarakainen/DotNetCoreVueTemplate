@@ -87,7 +87,7 @@ namespace DotNetCoreVueTemplate.CoreApp
                 endpoints.MapToVueCliProxy(
                     "{*path}",
                     new SpaOptions { SourcePath = $"../{Extensions.GetNamespaceRoot<Startup>()}.ClientApp" },
-                    npmScript: Debugger.IsAttached ? "serve" : null,
+                    npmScript: Debugger.IsAttached ? "serve" : "",
                     regex: "Compiled successfully",
                     forceKill: true,
                     wsl: false // Set to true if you are using WSL on windows. For other operating systems it will be ignored
