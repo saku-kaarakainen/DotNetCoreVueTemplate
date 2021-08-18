@@ -18,6 +18,6 @@ pnpm-debug.log*
 .vscode
 *.suo
 *.ntvs*
-*.njsproj
-*.sln
+#*.njsproj # this is not excluded, so that you can see the project in the visual studio
+#*.sln
 *.sw?
