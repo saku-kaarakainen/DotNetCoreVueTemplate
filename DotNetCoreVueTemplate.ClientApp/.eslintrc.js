@@ -19,7 +19,7 @@ module.exports = {
     'vue/script-indent': ['warn', 2, { baseIndent: 1 }],
     '@typescript-eslint/no-inferrable-types': 'off',
     'space-before-function-paren': ['error', {
-      anonymous: 'always',
+      anonymous: 'never',
       named: 'never',
       asyncArrow: 'always'
     }],
