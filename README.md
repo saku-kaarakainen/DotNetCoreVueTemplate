@@ -1,3 +1,7 @@
+# NOTE
+I recommend to use Microsoft's official tutorial
+https://docs.microsoft.com/en-us/visualstudio/javascript/tutorial-asp-net-core-with-vue?view=vs-2022
+
 # DotNetCoreVueTemplate
 My template for creating .NET Core Vue apps
 
